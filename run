@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+use AHAbid\JiraItTest\Services\JiraService;
+
+require 'vendor/autoload.php';
+
+define('BASE_DIR', __DIR__);
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/');
+$dotenv->load();
+
+$command = $argv[1] ?? null;
+if (!$command) {
+    throw new \Exception("Command name missing...");
+}
+
+$commandClass = 'AHAbid\\JiraItTest\\Actions\\' . $command;
+
+if (!class_exists($commandClass)) {
+    throw new \Exception("Command '{$commandClass}' not found.");
+}
+
+writeLog('Running Command: ' . $commandClass);
+
+(new $commandClass())->execute();
