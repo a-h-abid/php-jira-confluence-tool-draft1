@@ -4,9 +4,9 @@ namespace AHAbid\JiraItTest\Console;
 
 use AHAbid\JiraItTest\Services\JiraService;
 use AHAbid\JiraItTest\Utils\CsvReader;
+use AHAbid\JiraItTest\Config\FilePath;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,17 +25,15 @@ class ReadCsvJiraIssuesAndSaveContentsCommand extends Command
     ): int {
         $force = $input->getOption('force');
 
-        $filePath = BASE_DIR . '/files/input/jira-stories.csv';
         $jiraService = JiraService::build();
-        $storePath = BASE_DIR . '/files/stories/';
 
-        foreach (CsvReader::read($filePath) as $row) {
+        foreach (CsvReader::read(FilePath::INPUT . 'jira-stories.csv') as $row) {
             $issueKey = $row[0];
             if ($issueKey == 'Issue key') {
                 continue;
             }
 
-            $storedStoryFile = $storePath . '/' . $issueKey . '.md';
+            $storedStoryFile = FilePath::STORIES . $issueKey . '.md';
             if (!$force && file_exists($storedStoryFile)) {
                 $output->writeln('Skipping fetch as file exists for ' . $issueKey);
                 continue;
@@ -50,7 +48,7 @@ class ReadCsvJiraIssuesAndSaveContentsCommand extends Command
                 continue;
             }
 
-            file_put_contents($storePath . '/' . $issueKey . '.md', $content);
+            file_put_contents($storedStoryFile, $content);
             $output->writeln('Stored content for ' . $issueKey);
             sleep(1);
         }
