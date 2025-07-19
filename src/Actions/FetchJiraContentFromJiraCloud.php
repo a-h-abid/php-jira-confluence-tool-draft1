@@ -7,12 +7,14 @@ use AHAbid\JiraItTest\Services\JiraService;
 
 class FetchJiraContentFromJiraCloud
 {
+    private static $jiraService;
+
     /**
      * @throws EmptyContentException
      */
     public static function execute(string $issueKey): string
     {
-        $jiraService = JiraService::build();
+        $jiraService = self::getJiraService();
 
         $content = trim($jiraService->getContent($issueKey, true));
 
@@ -21,5 +23,19 @@ class FetchJiraContentFromJiraCloud
         }
 
         return $content;
+    }
+
+    public static function clearInstance()
+    {
+        self::$jiraService = null;
+    }
+
+    private static function getJiraService()
+    {
+        if (empty(self::$jiraService)) {
+            self::$jiraService = JiraService::build();
+        }
+
+        return self::$jiraService;
     }
 }
