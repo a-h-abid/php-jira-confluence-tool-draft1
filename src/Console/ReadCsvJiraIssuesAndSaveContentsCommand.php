@@ -49,7 +49,7 @@ class ReadCsvJiraIssuesAndSaveContentsCommand extends Command
 
                 $output->writeln('Stored content for ' . $issueKey);
 
-                sleep(1);
+                usleep(300);
             } catch (EmptyContentException $e) {
                 writeLog("[Command FetchJiraContentAndSaveCommand]: {$e->getMessage()}", 'error');
                 $output->writeln('<error>Empty content for ' . $issueKey. '</>');
@@ -68,7 +68,7 @@ class ReadCsvJiraIssuesAndSaveContentsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('force', null, InputOption::VALUE_NONE, 'Force to re-fetch contents from Jira Cloud', 1)
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force to re-fetch contents from Jira Cloud')
         ;
     }
 }
