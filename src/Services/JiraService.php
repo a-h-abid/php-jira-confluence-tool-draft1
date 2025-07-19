@@ -2,6 +2,7 @@
 
 namespace AHAbid\JiraItTest\Services;
 
+use AHAbid\JiraItTest\DTO\JiraComment;
 use AHAbid\JiraItTest\Exceptions\CurlResponseException;
 use League\HTMLToMarkdown\HtmlConverter;
 use League\HTMLToMarkdown\Converter\TableConverter;
@@ -10,6 +11,7 @@ use CurlHandle;
 class JiraService
 {
     private CurlHandle|false $curlHandle;
+    private HtmlConverter $markdownConverter;
 
     public function __construct(
         public readonly string $instanceUrl,
@@ -17,6 +19,8 @@ class JiraService
         public readonly string $token
     ) {
         $this->initCurlHandle();
+        $this->markdownConverter = new HtmlConverter();
+        $this->markdownConverter->getEnvironment()->addConverter(new TableConverter());
     }
 
     public function __destruct()
@@ -42,15 +46,26 @@ class JiraService
             return $html;
         }
 
-        $markdownConverter = new HtmlConverter();
-        $markdownConverter->getEnvironment()->addConverter(new TableConverter());
-
-        return $markdownConverter->convert($html);
+        return $this->markdownConverter->convert($html);
     }
 
+    /**
+     * @return JiraComment[]
+     */
     public function getComments($jiraIssueId): array
     {
-        return $this->sendRequestToJira($this->instanceUrl . '/rest/api/3/issue/' . $jiraIssueId . '/comment', 'GET');
+        $comments = $this->sendRequestToJira($this->instanceUrl . '/rest/api/3/issue/' . $jiraIssueId . '/comment?expand=renderedBody', 'GET');
+
+        $comments = array_map(function ($comment) {
+            return new JiraComment(
+                createdAt: \DateTime::createFromFormat('Y-m-d\TH:i:s.vO', $comment['created']),
+                body: $this->markdownConverter->convert($comment['renderedBody']),
+                authorName: $comment['author']['displayName'],
+                authorEmail: $comment['author']['emailAddress'] ?? null,
+            );
+        }, $comments['comments'] ?? []);
+
+        return $comments;
     }
 
     private function initCurlHandle(): void

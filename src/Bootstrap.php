@@ -17,6 +17,7 @@ class Bootstrap
         $application = new Application();
 
         $application->add(new \AHAbid\JiraItTest\Console\FetchJiraContentAndSaveCommand());
+        $application->add(new \AHAbid\JiraItTest\Console\FetchJiraIssueCommentsAndSaveCommand());
         $application->add(new \AHAbid\JiraItTest\Console\ReadCsvJiraIssuesAndSaveContentsCommand());
 
         $application->run();

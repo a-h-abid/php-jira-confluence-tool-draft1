@@ -25,7 +25,7 @@ class FetchJiraContentAndSaveCommand extends Command
         $issueKey = $input->getArgument('issue-key');
 
         try {
-            $output->writeln('Fetching for ' . $issueKey);
+            $output->writeln('Fetching content for ' . $issueKey);
 
             $content = FetchJiraContentFromJiraCloud::execute($issueKey);
 
