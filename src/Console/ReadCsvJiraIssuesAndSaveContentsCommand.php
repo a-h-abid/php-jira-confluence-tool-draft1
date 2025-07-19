@@ -2,9 +2,11 @@
 
 namespace AHAbid\JiraItTest\Console;
 
-use AHAbid\JiraItTest\Services\JiraService;
+use AHAbid\JiraItTest\Actions\FetchJiraContentFromJiraCloud;
+use AHAbid\JiraItTest\Actions\SaveJiraContentsToMarkdownFile;
 use AHAbid\JiraItTest\Utils\CsvReader;
 use AHAbid\JiraItTest\Config\FilePath;
+use AHAbid\JiraItTest\Exceptions\EmptyContentException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,19 +15,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'jira:read-from-csv-and-save-contents',
-    description: 'Get Jira Story IDs from CSV, fetch contents and store in markdown file.',
-    help: 'This command allows you to save Jira contents in markdown file...',
+    description: 'Use Jira Story IDs from CSV to fetch contents if not cached already and store in markdown file.',
+    help: 'This command allows you to save Jira issues contents in markdown file...',
 )]
 class ReadCsvJiraIssuesAndSaveContentsCommand extends Command
 {
-
     public function __invoke(
         InputInterface $input,
         OutputInterface $output
     ): int {
         $force = $input->getOption('force');
-
-        $jiraService = JiraService::build();
 
         foreach (CsvReader::read(FilePath::INPUT . 'jira-stories.csv') as $row) {
             $issueKey = $row[0];
@@ -33,24 +32,28 @@ class ReadCsvJiraIssuesAndSaveContentsCommand extends Command
                 continue;
             }
 
-            $storedStoryFile = FilePath::STORIES . $issueKey . '.md';
+            $storedStoryFile = FilePath::issueStoryPath($issueKey);
             if (!$force && file_exists($storedStoryFile)) {
-                $output->writeln('Skipping fetch as file exists for ' . $issueKey);
+                writeLog("[Command ReadCsvJiraIssuesAndSaveContentsCommand]: Skipping {$issueKey}, file exists", 'warn');
+                $output->writeln("Skipping {$issueKey}, file exists");
+
                 continue;
             }
 
-            $output->writeln('Fetching for ' . $issueKey);
+            try {
+                $output->writeln('Fetching content for ' . $issueKey);
 
-            $content = trim($jiraService->getContent($issueKey));
-            if ($content == '') {
-                writeLog("{$issueKey} content is empty, fetched via JiraService.");
-                $output->writeln('Empty content for ' . $issueKey);
-                continue;
+                $content = FetchJiraContentFromJiraCloud::execute($issueKey);
+
+                SaveJiraContentsToMarkdownFile::execute($issueKey, $content);
+
+                $output->writeln('Stored content for ' . $issueKey);
+
+                sleep(1);
+            } catch (EmptyContentException $e) {
+                writeLog("[Command FetchJiraContentAndSaveCommand]: {$e->getMessage()}", 'error');
+                $output->writeln('<error>Empty content for ' . $issueKey. '</>');
             }
-
-            file_put_contents($storedStoryFile, $content);
-            $output->writeln('Stored content for ' . $issueKey);
-            sleep(1);
         }
 
         $output->writeln([

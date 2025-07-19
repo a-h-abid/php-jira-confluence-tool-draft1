@@ -41,7 +41,7 @@ class FetchJiraContentAndSaveCommand extends Command
 
             return Command::SUCCESS;
         } catch (EmptyContentException $e) {
-            writeLog("Error [Command FetchJiraContentAndSaveCommand]: {$e->getMessage()}", 'error');
+            writeLog("[Command FetchJiraContentAndSaveCommand]: {$e->getMessage()}", 'error');
 
             $output->writeln('<error>Empty content for ' . $issueKey. '</>');
 
