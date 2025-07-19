@@ -51,7 +51,7 @@ class ReadCsvJiraIssuesAndSaveContentsCommand extends Command
 
                 usleep(300);
             } catch (EmptyContentException $e) {
-                writeLog("[Command FetchJiraContentAndSaveCommand]: {$e->getMessage()}", 'error');
+                writeLog("[Command ReadCsvJiraIssuesAndSaveContentsCommand]: {$e->getMessage()}", 'error');
                 $output->writeln('<error>Empty content for ' . $issueKey. '</>');
             }
         }
