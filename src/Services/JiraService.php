@@ -45,7 +45,7 @@ class JiraService
         $markdownConverter = new HtmlConverter();
         $markdownConverter->getEnvironment()->addConverter(new TableConverter());
 
-        return $markdownConverter->convert(html_entity_decode($html));
+        return $markdownConverter->convert($html);
     }
 
     public function getComments($jiraIssueId): array
