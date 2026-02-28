@@ -23,19 +23,25 @@ A PHP CLI tool for fetching Jira issue content and comments from Jira Cloud and 
    composer install
    ```
 
-3. **Configure environment variables**
+3. **Configure credentials**
 
-   Copy the example environment file and fill in your Jira credentials:
+   Copy the example configuration file and fill in your Jira credentials:
+
+   ```bash
+   cp config.example.php config.php
+   ```
+
+   The application also continues to support `.env` files if you prefer:
 
    ```bash
    cp .env.example .env
    ```
 
-   Edit `.env` with your details (see [Configuration](#configuration) below).
+   Edit `config.php` or `.env` with your details (see [Configuration](#configuration) below).
 
 ## Configuration
 
-The `.env` file contains the following settings:
+The `config.php` (or `.env`) file contains the following settings:
 
 | Variable | Description |
 | --- | --- |
