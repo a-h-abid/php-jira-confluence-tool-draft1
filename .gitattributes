@@ -1,0 +1,40 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code
+*.php text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+
+# Scripts
+*.sh text eol=lf
+run text eol=lf
+
+# Documentation
+*.md text eol=lf
+
+# Configuration files
+.editorconfig text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.env.example text eol=lf
+
+# Composer
+composer.json text eol=lf
+composer.lock text eol=lf linguist-generated=true
+
+# PHPUnit
+phpunit.xml text eol=lf
+
+# Archives
+*.zip binary
+*.tar binary
+*.gz binary
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text eol=lf
