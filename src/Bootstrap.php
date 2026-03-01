@@ -11,8 +11,18 @@ class Bootstrap
     {
         define('BASE_DIR', $baseDir);
 
+        $configPath = $baseDir . '/config.php';
+        if (file_exists($configPath)) {
+            $config = require $configPath;
+            if (is_array($config)) {
+                foreach ($config as $key => $value) {
+                    $_ENV[$key] = $value;
+                }
+            }
+        }
+
         $dotenv = Dotenv::createImmutable($baseDir . '/');
-        $dotenv->load();
+        $dotenv->safeLoad();
 
         $application = new Application();
 

@@ -1,0 +1,8 @@
+<?php
+
+return [
+    'JIRA_URL' => 'https://your-jira-instance.atlassian.net',
+    'JIRA_USERNAME' => 'your@email.com',
+    'JIRA_API_TOKEN' => 'your-api-token',
+    'SOLUTIONS_URL_LINK_PATTERN' => '/https:\/\/abc\.example\.com\/solutions\\S+/',
+];
